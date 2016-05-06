@@ -25,7 +25,7 @@ If you do not have [Composer](http://getcomposer.org/), follow the instructions 
 With Composer installed, you can then install the application using the following commands:
 
     composer global require "fxp/composer-asset-plugin:~1.1.3"
-    composer create-project --prefer-dist dca-team/yii2-app-another another.dev
+    composer create-project --prefer-dist delagics/yii2-app-another another.dev
 
 The first command installs the [composer asset plugin](https://github.com/francoispluchino/composer-asset-plugin/)
 which allows managing bower and npm package dependencies through Composer. You only need to run this command
@@ -36,7 +36,7 @@ You can choose a different directory name if you want.
 
 Clone repository as a web root.
 ```
-git clone git@bitbucket.org:dca-team/yii2-app-another.git another.dev
+git clone git@github.com:delagics/yii2-app-another.git another.dev
 ```
 
 A directory named `another.dev` is your Web root.
