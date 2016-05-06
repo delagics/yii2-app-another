@@ -1,0 +1,39 @@
+{
+    "name": "delagics/yii2-app-another",
+    "description": "Yii 2 Another Project Template",
+    "keywords": ["yii2", "advanced", "delagics", "another", "project template"],
+    "homepage": "http://www.delagics.com/",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/delagics/yii2-app-another/issues",
+        "source": "https://github.com/delagics/yii2-app-another.git"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.4.0",
+        "yiisoft/yii2": "~2.0",
+        "yiisoft/yii2-bootstrap": "*",
+        "yiisoft/yii2-swiftmailer": "*",
+        "codemix/yii2-localeurls": "~1.4",
+        "dektrium/yii2-user": "0.9.*@dev",
+        "dektrium/yii2-rbac": "dev-master"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "*",
+        "yiisoft/yii2-gii": "*"
+    },
+    "config": {
+        "vendor-dir": "app/vendor",
+        "process-timeout": 1800
+    },
+    "extra": {
+        "asset-installer-paths": {
+            "npm-asset-library": "app/vendor/npm",
+            "bower-asset-library": "app/vendor/bower"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "php ../init --env=Development --overwrite=n"
+    }
+}
