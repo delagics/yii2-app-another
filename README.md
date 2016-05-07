@@ -89,77 +89,42 @@ php yii app/set-up
 
 ```nginx
     server {
+        listen 80;
         charset utf-8;
         client_max_body_size 128M;
-        listen 80;
-        server_name another.dev www.another.dev;
         root /var/www/another.dev/public;
+        server_name another.dev www.another.dev;
         index index.php index.html index.htm;
-        # access_log  /var/www/another.dev/logs/access.log;
-        # error_log   /var/www/another.dev/logs/error.log;
-        location ~ \.php$ {
-            try_files $uri =404;
-            include fastcgi_params;
-            fastcgi_index index.php;
-            fastcgi_pass unix:/run/php/php7.0-fpm.sock;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        }
-        ## Redirect everything that isn't a real file to index.php
+        # access_log /var/www/another.dev/logs/access_log.txt;
+        # error_log /var/www/another.dev/logs/error_log.txt error;
         location / {
             try_files $uri $uri/ /index.php?$args;
         }
-        ## Storage
-        location ~ ^/storage/.*\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|css|rss|atom|js|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf|html|txt|htm)$ {
-            expires max;
-            log_not_found off;
-            access_log off;
-            add_header Cache-Control public;
-            # don't send cookies
-            fastcgi_hide_header Set-Cookie;
-            # CORS config
-            set $cors "true";
-            # Determine the HTTP request method used
-            if ($request_method = 'OPTIONS') {
-                set $cors "${cors}options";
+        location /admin {
+            try_files $uri $uri/ /admin/index.php?$args;
+        }
+        location ~ \.php$ {
+            #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+            try_files $uri =404;
+            include fastcgi_params;
+            fastcgi_index index.php;
+            fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+        location /storage {
+            # Deny access to any files with a .php extension in the storage directory
+            location ~ \.php$ {
+                deny all;
             }
-            if ($request_method = 'GET') {
-                set $cors "${cors}get";
-            }
-            if ($request_method = 'POST') {
-                set $cors "${cors}post";
-            }
-            if ($cors = "true") {
-                # Catch all incase there's a request method we're not dealing with properly
-                add_header 'Access-Control-Allow-Origin' '*';
-            }
-            if ($cors = "trueget") {
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Credentials' 'true';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
-            }
-            if ($cors = "trueoptions") {
-                add_header 'Access-Control-Allow-Origin' '*';
-                # Om nom nom cookies
-                add_header 'Access-Control-Allow-Credentials' 'true';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                # Custom headers and headers various browsers *should* be OK with but aren't
-                add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
-                # Tell client that this pre-flight info is valid for 20 days
-                add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain charset=UTF-8';
-                add_header 'Content-Length' 0;
-                return 204;
-            }
-            if ($cors = "truepost") {
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Credentials' 'true';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+            location ~* ^/.+\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+                expires max;
+                add_header Cache-Control public;
+                log_not_found off;
+                access_log off;
             }
         }
-        ## Disable viewing .svn, .git dirs, .htaccess & .htpassword files
-        location ~ /\.(ht|svn|git) {
+        # Deny all attempts to access hidden files and folders such as .git, .htaccess, .htpasswd, .DS_Store.
+        location ~ /\. {
             deny all;
         }
         location = /favicon.ico {

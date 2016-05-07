@@ -25,7 +25,11 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'request' => [
+            'baseUrl'=>'/admin',
+        ],
         'urlManager' => [
+            'scriptUrl' => '/admin/index.php'
         ],
         'i18n' => [
             'translations' => [
@@ -45,7 +49,7 @@ return [
     'modules' => [
         'user' => [
             // following line will restrict access to profile, recovery, registration and settings controllers from backend
-            //'as backend' => 'back\filters\BackFilter',
+            'as backend' => 'back\filters\BackFilter',
         ],
     ],
     'params' => $params,
