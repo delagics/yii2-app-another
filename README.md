@@ -1,5 +1,11 @@
 # Yii 2 Another Project Template
 
+[![Latest Stable Version](https://poser.pugx.org/delagics/yii2-app-another/v/stable.svg)](https://packagist.org/packages/delagics/yii2-app-another)
+[![Total Downloads](https://poser.pugx.org/delagics/yii2-app-another/downloads)](https://packagist.org/packages/delagics/yii2-app-another)
+[![Latest Unstable Version](https://poser.pugx.org/delagics/yii2-app-another/v/unstable.svg)](https://packagist.org/packages/delagics/yii2-app-another)
+[![Code Climate](https://codeclimate.com/github/delagics/yii2-app-another/badges/gpa.svg)](https://codeclimate.com/github/delagics/yii2-app-another)
+[![License](https://poser.pugx.org/delagics/yii2-app-another/license.svg)](https://packagist.org/packages/delagics/yii2-app-another)
+
 Yii 2 Another Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
 developing complex Web applications with multiple tiers.
 
@@ -9,8 +15,15 @@ is a separate Yii application.
 The template is designed to work in a team development environment. It supports
 deploying the application in different environments.
 
-## Installation
+## What's inside:
 
+- Adjusted language management through URLs with help of `codemix/yii2-localeurls` [[see](https://github.com/codemix/yii2-localeurls)];
+- Flexible user registration and authentication module `dektrium/yii2-user` [[see](https://github.com/dektrium/yii2-user)];
+- RBAC management module `dektrium/yii2-rbac` [[see](https://github.com/dektrium/yii2-rbac)];
+- Added `yii app` command with help of which it is easier to prepare your database [[see](https://github.com/delagics/yii2-app-another/blob/master/app/console/controllers/AppController.php)].
+
+
+## Installation
 
 ### Requirements
 
