@@ -1,38 +1,17 @@
 <?php
+
 namespace back\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
-use yii\web\Controller;
+use back\components\BackController;
 
 /**
- * Site controller
+ * Class SiteController
+ *
+ * @package back\controllers
  */
-class SiteController extends Controller
+class SiteController extends BackController
 {
-    /**
-     * @inheritdoc
-     */
-    /*public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'actions' => ['login', 'error'],
-                        'allow' => true,
-                    ],
-                    [
-                        'actions' => ['logout', 'index'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-        ];
-    }*/
-
     /**
      * @inheritdoc
      */
