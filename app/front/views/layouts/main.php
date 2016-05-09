@@ -6,6 +6,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use base\widgets\Alert;
 use front\assets\AppAsset;
+use base\widgets\LangSelect;
 
 /**
  * @var $this    yii\web\View
@@ -51,6 +52,8 @@ AppAsset::register($this);
             . Html::endForm()
             . '</li>';
     }
+
+    $menuItems[] = LangSelect::widget();
 
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],

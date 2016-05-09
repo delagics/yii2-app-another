@@ -34,10 +34,10 @@ class Alert extends Widget
      * - $value is the bootstrap alert type (i.e. danger, success, info, warning)
      */
     public $alertTypes = [
-        'error'   => 'alert-danger',
-        'danger'  => 'alert-danger',
+        'error' => 'alert-danger',
+        'danger' => 'alert-danger',
         'success' => 'alert-success',
-        'info'    => 'alert-info',
+        'info' => 'alert-info',
         'warning' => 'alert-warning'
     ];
 
@@ -54,7 +54,7 @@ class Alert extends Widget
         $appendCss = isset($this->options['class']) ? ' ' . $this->options['class'] : '';
         foreach ($flashes as $type => $data) {
             if (isset($this->alertTypes[$type])) {
-                $data = (array) $data;
+                $data = (array)$data;
                 foreach ($data as $i => $message) {
                     /* initialize css class for each alert box */
                     $this->options['class'] = $this->alertTypes[$type] . $appendCss;
