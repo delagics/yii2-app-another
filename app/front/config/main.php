@@ -1,12 +1,11 @@
 <?php
+
 $params = array_merge(
     require(__DIR__ . '/../../base/config/params.php'),
-    require(__DIR__ . '/../../base/config/params-local.php'),
-    require(__DIR__ . '/params.php'),
-    require(__DIR__ . '/params-local.php')
+    require(__DIR__ . '/params.php')
 );
 
-return [
+$config = [
     'id' => 'app-front',
     'name' => env('FRONT_APP_NAME', 'Awesome application'),
     'basePath' => dirname(__DIR__),
@@ -25,11 +24,13 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'request' => [
+            'cookieValidationKey' => env('FRONT_COOKIE_KEY', ''),
+        ],
         'urlManager' => [
             'class' => 'base\components\UrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'scriptUrl' => '/admin/index.php',
             'languages' => explode(',', env('FRONT_APP_LANGUAGES', 'en')),
             'enableDefaultLanguageUrlCode' => true,
             'ignoreLanguageUrlPatterns' => [],
@@ -44,3 +45,14 @@ return [
     ],
     'params' => $params,
 ];
+
+if (YII_ENV_DEV) {
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['bootstrap'][] = 'gii';
+
+    $config['modules']['debug'] = ['class' => 'yii\debug\Module'];
+    $config['modules']['gii'] = ['class' => 'yii\gii\Module'];
+}
+
+return $config;

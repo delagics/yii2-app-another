@@ -8,19 +8,18 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 
 /**
- * Class AppController
+ * Class InitController
  *
  * @package console\controllers
- *
  * @property-read \yii\db\Connection $db
  */
-class AppController extends Controller
+class InitController extends Controller
 {
     /**
      * @var string the ID of the action that is used when the action ID is not specified
-     * in the request. Defaults to 'set-up'.
+     * in the request. Defaults to 'up'.
      */
-    public $defaultAction = 'set-up';
+    public $defaultAction = 'up';
 
     /**
      * @var \yii\db\Connection application db component.
@@ -33,44 +32,48 @@ class AppController extends Controller
      *
      * @return integer the status of the action execution. 0 means normal, other values mean abnormal.
      */
-    public function actionSetUp()
+    public function actionUp()
     {
         /***************************************************************************************************************
-         * INPUT AREA
+         * Getting input data from console user.
          **************************************************************************************************************/
 
         $email = $this->prompt('Enter global admin user email:', [
-            'default' => ArrayHelper::getValue(Yii::$app->params, 'adminEmail', 'admin@example.com')
+            'default' => ArrayHelper::getValue(Yii::$app->params, 'adminEmail', 'admin@example.com'),
         ]);
         $username = $this->prompt('Enter global admin user name:', [
-            'default' => ArrayHelper::getValue(Yii::$app->getModule('user')->admins, 0, 'admin')
+            'default' => ArrayHelper::getValue(Yii::$app->getModule('user')->admins, 0, 'admin'),
         ]);
         $password = $this->prompt('Enter global admin user password:', ['default' => '123456']);
 
         $this->askForInteraction();
 
         /***************************************************************************************************************
-         * Applying `dektrium/yii2-user` and `dektrium/yii2-rbac` migrations, and creating first user.
+         * Applying application migrations.
          **************************************************************************************************************/
 
-        Yii::$app->runAction('migrate/up', [
-            'migrationPath' => '@vendor/dektrium/yii2-user/migrations',
-            'interactive' => $this->interactive,
-        ]);
+        $migrations = explode(',', env('APP_MIGRATION_LOOKUP', '@console/migrations'));
 
-        Yii::$app->runAction('migrate/up', [
-            'migrationPath' => '@yii/rbac/migrations',
-            'interactive' => $this->interactive,
-        ]);
+        foreach ($migrations as $migrationPath) {
+            Yii::$app->runAction('migrate/up', [
+                'migrationPath' => $migrationPath,
+                'interactive' => $this->interactive,
+            ]);
+        }
 
-        // Create and confirm global admin user
+        /***************************************************************************************************************
+         * Creating and confirming account of the first user.
+         **************************************************************************************************************/
+
         Yii::$app->runAction('user/create', [$email, $username, $password]);
-        // Need to wait a while, while user is being inserted into database
+
+        // Have to wait a bit until the user is inserted into the database.
         sleep(1);
+
         Yii::$app->runAction('user/confirm', [$email]);
 
         /***************************************************************************************************************
-         * Clearing all cache
+         * Clearing all cache.
          **************************************************************************************************************/
 
         Yii::$app->runAction('cache/flush-all');
@@ -79,31 +82,37 @@ class AppController extends Controller
     }
 
     /**
-     * Revert changes made by 'set-up' action.
+     * Revert changes made by 'up' action.
      * Reverts depending modules migrations and other stuff.
+     * This method probably will not work if there is holes in migration history.
+     *
      * @return integer the status of the action execution. 0 means normal, other values mean abnormal.
      */
-    public function actionTearDown()
+    public function actionDown()
     {
         $this->askForInteraction();
 
         $this->db->createCommand('SET foreign_key_checks = 0;')->execute();
 
         /***************************************************************************************************************
-         * Reverting `dektrium/yii2-user` and `dektrium/yii2-rbac` migrations.
+         * Reverting application migrations.
          **************************************************************************************************************/
 
-        Yii::$app->runAction('migrate/down', [
-            $this->countMigrations('@yii/rbac/migrations'),
-            'migrationPath' => '@yii/rbac/migrations',
-            'interactive' => $this->interactive,
-        ]);
+        $migrations = explode(',', env('APP_MIGRATION_LOOKUP', '@console/migrations'));
 
-        Yii::$app->runAction('migrate/down', [
-            $this->countMigrations('@vendor/dektrium/yii2-user/migrations'),
-            'migrationPath' => '@vendor/dektrium/yii2-user/migrations',
-            'interactive' => $this->interactive,
-        ]);
+        // Migrations should be reverted in reversed order.
+        $migrations = array_reverse($migrations);
+
+        foreach ($migrations as $migrationPath) {
+            $count = $this->countMigrations($migrationPath);
+            if ($count > 0) {
+                Yii::$app->runAction('migrate/down', [
+                    $count,
+                    'migrationPath' => $migrationPath,
+                    'interactive' => $this->interactive,
+                ]);
+            }
+        }
 
         $this->db->createCommand('SET foreign_key_checks = 1;')->execute();
 
@@ -124,12 +133,11 @@ class AppController extends Controller
      */
     public function actionDestroyDb()
     {
-        $str = $this->ansiFormat('Do you really want to destroy database? (yes|no)', Console::FG_RED);
-        $needReset = $this->prompt($str, ['default' => 'yes']);
-        $needReset = $needReset == 'y' || $needReset == 'yes' ? true : false;
-        $ok = true;
+        $str = $this->ansiFormat('Do you really want to destroy application database? (yes|no)', Console::FG_RED);
+        $destroy = $this->prompt($str, ['default' => 'no']);
+        $destroy = $destroy == 'y' || $destroy == 'yes' ? true : false;
 
-        if ($needReset) {
+        if ($destroy) {
             $tables = Yii::$app->getDb()->schema->tableNames;
             if ($tables) {
                 $this->db->createCommand('SET foreign_key_checks = 0;')->execute();
@@ -138,29 +146,33 @@ class AppController extends Controller
                     $this->db->createCommand()->dropTable($table)->execute();
                 }
                 $this->db->createCommand('SET foreign_key_checks = 1;')->execute();
-                $this->stdout('Successfully destroyed DB', Console::FG_GREEN);
+                $this->stdout('Successfully destroyed DB.', Console::FG_GREEN);
             } else {
-                $this->stderr('No tables found', Console::FG_YELLOW);
-                $ok = false;
+                $this->stderr('No tables found.', Console::FG_YELLOW);
             }
         } else {
-            $this->stdout('OK, Application is not touched', Console::FG_YELLOW);
+            $this->stdout('OK, Application database is not touched.', Console::FG_YELLOW);
         }
-        return $ok ? Controller::EXIT_CODE_NORMAL: Controller::EXIT_CODE_ERROR;
+
+        return Controller::EXIT_CODE_NORMAL;
     }
 
     /**
-     * Combines 'destroy-db', 'set-up' and 'insert-demo' actions.
+     * Runs 'destroy-db', 'up' and 'insert-demo' actions without user interaction.
      *
      * @return int
      */
     public function actionReset()
     {
-        Yii::$app->runAction('app/destroy-db', [
+        Yii::$app->runAction('init/destroy-db', [
             'interactive' => false,
         ]);
 
-        Yii::$app->runAction('app/set-up', [
+        /*Yii::$app->runAction('init/down', [
+            'interactive' => false,
+        ]);*/
+
+        Yii::$app->runAction('init/up', [
             'interactive' => false,
         ]);
 
@@ -174,11 +186,12 @@ class AppController extends Controller
     /**
      * Insert demo data into DB.
      *
+     * @todo use Faker.
      * @throws \yii\db\Exception
      */
     public function actionInsertDemo()
     {
-        $this->stdout('Inserting demo data ...', Console::FG_PURPLE);
+        $this->stdout('Inserting demo data...', Console::FG_PURPLE);
 
         // $command = $this->db->createCommand();
         // $command->batchInsert($model::tableName(), $model->attributes(), [
@@ -186,21 +199,21 @@ class AppController extends Controller
         //     [...]
         // ])->execute();
 
-        $this->stdout('Inserting demo data finished', Console::FG_PURPLE);
+        $this->stdout('Inserting demo data finished.', Console::FG_PURPLE);
+
         return Controller::EXIT_CODE_NORMAL;
     }
 
     /**
-     * Get current Connection.
+     * Ask user for interaction.
      *
-     * @return \yii\db\Connection
+     * @return void
      */
-    public function getDb()
+    public function askForInteraction()
     {
-        if ($this->_db === null) {
-            $this->_db = Yii::$app->getDb();
-        }
-        return $this->_db;
+        $str = $this->ansiFormat('Do you want to interact with this script? (yes|no)', Console::FG_YELLOW);
+        $isInteractive = $this->prompt($str, ['default' => 'no']);
+        $this->interactive = $isInteractive == 'no' || $isInteractive == 'n' ? false : true;
     }
 
     /**
@@ -216,6 +229,7 @@ class AppController extends Controller
             array_shift($args);
             $string = Console::ansiFormat($string, $args);
         }
+
         return $string;
     }
 
@@ -232,6 +246,7 @@ class AppController extends Controller
             array_shift($args);
             $string = Console::ansiFormat($string, $args);
         }
+
         return Console::stdout($string . "\n");
     }
 
@@ -248,6 +263,7 @@ class AppController extends Controller
             array_shift($args);
             $string = Console::ansiFormat($string, $args);
         }
+
         return fwrite(\STDERR, $string . "\n");
     }
 
@@ -263,14 +279,16 @@ class AppController extends Controller
     }
 
     /**
-     * Ask user for interaction.
+     * Get current Connection.
      *
-     * @return void
+     * @return \yii\db\Connection
      */
-    public function askForInteraction()
+    public function getDb()
     {
-        $str = $this->ansiFormat('Do you want to interact with script? (yes|no)', Console::FG_YELLOW);
-        $isInteractive = $this->prompt($str, ['default' => 'no']);
-        $this->interactive = $isInteractive == 'no' || $isInteractive == 'n' ? false : true;
+        if ($this->_db === null) {
+            $this->_db = Yii::$app->getDb();
+        }
+
+        return $this->_db;
     }
 }

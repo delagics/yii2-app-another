@@ -1,4 +1,5 @@
 <?php
+
 Yii::setAlias('@base', dirname(__DIR__));
 Yii::setAlias('@front', dirname(dirname(__DIR__)) . '/front');
 Yii::setAlias('@back', dirname(dirname(__DIR__)) . '/back');

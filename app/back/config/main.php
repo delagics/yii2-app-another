@@ -1,12 +1,11 @@
 <?php
+
 $params = array_merge(
     require(__DIR__ . '/../../base/config/params.php'),
-    require(__DIR__ . '/../../base/config/params-local.php'),
-    require(__DIR__ . '/params.php'),
-    require(__DIR__ . '/params-local.php')
+    require(__DIR__ . '/params.php')
 );
 
-return [
+$config = [
     'id' => 'app-back',
     'name' => env('BACK_APP_NAME', 'Awesome application'),
     'basePath' => dirname(__DIR__),
@@ -28,6 +27,7 @@ return [
         ],
         'request' => [
             'baseUrl'=>'/admin',
+            'cookieValidationKey' => env('FRONT_COOKIE_KEY', ''),
         ],
         'urlManager' => [
             'class' => 'base\components\UrlManager',
@@ -62,3 +62,14 @@ return [
     ],
     'params' => $params,
 ];
+
+if (YII_ENV_DEV) {
+    // configuration adjustments for 'dev' environment
+    $config['bootstrap'][] = 'debug';
+    $config['bootstrap'][] = 'gii';
+
+    $config['modules']['debug'] = ['class' => 'yii\debug\Module'];
+    $config['modules']['gii'] = ['class' => 'yii\gii\Module'];
+}
+
+return $config;

@@ -8,9 +8,7 @@ require(__DIR__ . '/../app/front/config/bootstrap.php');
 
 $config = yii\helpers\ArrayHelper::merge(
     require(__DIR__ . '/../app/base/config/main.php'),
-    require(__DIR__ . '/../app/base/config/main-local.php'),
-    require(__DIR__ . '/../app/front/config/main.php'),
-    require(__DIR__ . '/../app/front/config/main-local.php')
+    require(__DIR__ . '/../app/front/config/main.php')
 );
 
 $application = new yii\web\Application($config);
