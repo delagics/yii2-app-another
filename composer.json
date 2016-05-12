@@ -9,7 +9,8 @@
         "issues": "https://github.com/delagics/yii2-app-another/issues",
         "source": "https://github.com/delagics/yii2-app-another.git"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "~2.0",
@@ -17,11 +18,17 @@
         "yiisoft/yii2-swiftmailer": "*",
         "codemix/yii2-localeurls": "~1.4",
         "dektrium/yii2-user": "0.9.*@dev",
-        "dektrium/yii2-rbac": "dev-master"
+        "dektrium/yii2-rbac": "dev-master",
+        "vlucas/phpdotenv": "~2.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*"
+    },
+    "autoload": {
+        "files": [
+            "app/base/helpers/helpers.php"
+        ]
     },
     "config": {
         "vendor-dir": "app/vendor",

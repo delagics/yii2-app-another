@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-back',
+    'name' => env('BACK_APP_NAME', 'Awesome application'),
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'back\controllers',
     'bootstrap' => ['log'],
@@ -29,7 +30,14 @@ return [
             'baseUrl'=>'/admin',
         ],
         'urlManager' => [
-            'scriptUrl' => '/admin/index.php'
+            'class' => 'base\components\UrlManager',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'scriptUrl' => '/admin/index.php',
+            'languages' => explode(',', env('BACK_APP_LANGUAGES', 'en')),
+            'enableDefaultLanguageUrlCode' => true,
+            'ignoreLanguageUrlPatterns' => [],
+            'rules'=>[],
         ],
         'i18n' => [
             'translations' => [

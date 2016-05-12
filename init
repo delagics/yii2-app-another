@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Yii Application Initialization Tool
  *
@@ -76,6 +77,8 @@ foreach ($files as $file) {
         break;
     }
 }
+
+setDotEnv($root, '.env', $env['path']);
 
 $callbacks = ['setCookieValidationKey', 'setWritable', 'setExecutable', 'createSymlink'];
 foreach ($callbacks as $callback) {
@@ -195,10 +198,41 @@ function setCookieValidationKey($root, $paths)
     foreach ($paths as $file) {
         echo "   generate cookie validation key in $file\n";
         $file = $root . '/' . $file;
-        $length = 32;
-        $bytes = openssl_random_pseudo_bytes($length);
-        $key = strtr(substr(base64_encode($bytes), 0, $length), '+/=', '_-.');
-        $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'$key'", file_get_contents($file));
+        $content = file_get_contents($file);
+        $content = preg_replace_callback('/<cookie_validation_key>/', function () {
+            $length = 32;
+            $bytes = openssl_random_pseudo_bytes(32, $crypto_strong);
+            return strtr(substr(base64_encode($bytes), 0, $length), '+/', '_-');
+        }, $content);
+        file_put_contents($file, $content);
+    }
+}
+
+function setDotEnv($root, $file, $env)
+{
+    $file = $root . '/' . $file;
+
+    if (is_file($file . '.example') && !is_file($file)) {
+        echo "   creating .env file\n";
+
+        copy($file . '.example', $file);
+    }
+    echo "    setting YII_ENV and YII_DEBUG in .env\n";
+    $content = file_get_contents($file);
+    $config = [
+        'dev' => [
+            'YII_ENV' => 'dev',
+            'YII_DEBUG' => 'true'
+        ],
+        'prod' => [
+            'YII_ENV' => 'prod',
+            'YII_DEBUG' => 'false'
+        ]
+    ];
+
+    if (isset($config[$env])) {
+        $content = preg_replace('/^(YII_ENV)(.+)$/m', '$1 = ' . $config[$env]['YII_ENV'], $content);
+        $content = preg_replace('/^(YII_DEBUG)(.+)$/m', '$1 = ' . $config[$env]['YII_DEBUG'], $content);
         file_put_contents($file, $content);
     }
 }

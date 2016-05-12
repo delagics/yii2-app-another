@@ -39,12 +39,11 @@ return [
             'public/storage',
         ],
         'setExecutable' => [
-            'app/yii',
+            'yii',
             //'tests/codeception/bin/yii',
         ],
         'setCookieValidationKey' => [
-            'app/back/config/main-local.php',
-            'app/front/config/main-local.php',
+            '.env',
         ],
     ],
     'Production' => [
@@ -60,8 +59,7 @@ return [
             'app/yii',
         ],
         'setCookieValidationKey' => [
-            'app/back/config/main-local.php',
-            'app/front/config/main-local.php',
+            '.env',
         ],
     ],
 ];

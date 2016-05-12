@@ -8,6 +8,7 @@ $params = array_merge(
 
 return [
     'id' => 'app-front',
+    'name' => env('FRONT_APP_NAME', 'Awesome application'),
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'front\controllers',
@@ -24,10 +25,15 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-
         'urlManager' => [
-            'rules' => [
-            ],
+            'class' => 'base\components\UrlManager',
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'scriptUrl' => '/admin/index.php',
+            'languages' => explode(',', env('FRONT_APP_LANGUAGES', 'en')),
+            'enableDefaultLanguageUrlCode' => true,
+            'ignoreLanguageUrlPatterns' => [],
+            'rules'=>[],
         ],
     ],
     'modules' => [
