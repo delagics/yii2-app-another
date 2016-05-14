@@ -5,7 +5,7 @@ namespace console\controllers;
 use Yii;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Console;
+use console\helpers\Console;
 
 /**
  * Class InitController
@@ -30,7 +30,7 @@ class InitController extends Controller
      * Prepare application by running depending modules migrations and other stuff.
      * Deals basically with database but can be also cache, assets and so on.
      *
-     * @return integer the status of the action execution. 0 means normal, other values mean abnormal.
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
     public function actionUp()
     {
@@ -86,7 +86,7 @@ class InitController extends Controller
      * Reverts depending modules migrations and other stuff.
      * This method probably will not work if there is holes in migration history.
      *
-     * @return integer the status of the action execution. 0 means normal, other values mean abnormal.
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
     public function actionDown()
     {
@@ -128,12 +128,12 @@ class InitController extends Controller
     /**
      * Delete (reset) found database tables.
      *
-     * @return integer the status of the action execution. 0 means normal, other values mean abnormal.
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      * @throws \yii\db\Exception
      */
     public function actionDestroyDb()
     {
-        $str = $this->ansiFormat('Do you really want to destroy application database? (yes|no)', Console::FG_RED);
+        $str = Console::ansiFormat('Do you really want to destroy application database? (yes|no)', Console::FG_RED);
         $destroy = $this->prompt($str, ['default' => 'no']);
         $destroy = $destroy == 'y' || $destroy == 'yes' ? true : false;
 
@@ -211,67 +211,16 @@ class InitController extends Controller
      */
     public function askForInteraction()
     {
-        $str = $this->ansiFormat('Do you want to interact with this script? (yes|no)', Console::FG_YELLOW);
+        $str = Console::ansiFormat('Do you want to interact with this script? (yes|no)', Console::FG_YELLOW);
         $isInteractive = $this->prompt($str, ['default' => 'no']);
         $this->interactive = $isInteractive == 'no' || $isInteractive == 'n' ? false : true;
-    }
-
-    /**
-     * Formats a string with ANSI codes.
-     *
-     * @param string $string the string to be formatted
-     * @return string
-     */
-    public function ansiFormat($string)
-    {
-        if ($this->isColorEnabled()) {
-            $args = func_get_args();
-            array_shift($args);
-            $string = Console::ansiFormat($string, $args);
-        }
-
-        return $string;
-    }
-
-    /**
-     * Prints a string to STDOUT.
-     *
-     * @param string $string the string to print
-     * @return int|boolean Number of bytes printed or false on error
-     */
-    public function stdout($string)
-    {
-        if ($this->isColorEnabled()) {
-            $args = func_get_args();
-            array_shift($args);
-            $string = Console::ansiFormat($string, $args);
-        }
-
-        return Console::stdout($string . "\n");
-    }
-
-    /**
-     * Prints a string to STDERR.
-     *
-     * @param string $string the string to print
-     * @return int|boolean Number of bytes printed or false on error
-     */
-    public function stderr($string)
-    {
-        if ($this->isColorEnabled(\STDERR)) {
-            $args = func_get_args();
-            array_shift($args);
-            $string = Console::ansiFormat($string, $args);
-        }
-
-        return fwrite(\STDERR, $string . "\n");
     }
 
     /**
      * Count files in migration folder.
      *
      * @param $alias
-     * @return integer
+     * @return int
      */
     public function countMigrations($alias)
     {
