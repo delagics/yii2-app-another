@@ -57,6 +57,13 @@ Then `cd` to the `app` folder and run:
 ```
 composer install
 ```
+
+Then run composer scripts that occurs after the `composer create-project` command has been executed.
+
+```
+composer run-script post-create-project-cmd
+```
+
 Then follow the instructions given in the next subsection.
 
 
@@ -65,23 +72,19 @@ Then follow the instructions given in the next subsection.
 After you install the application, you have to conduct the following steps to initialize
 the installed application. You only need to do these once for all.
 
-1. Open a console terminal in `app` directory, and execute the `php init` command and select `dev` as environment.
+1.  Create a new database and adjust the `DB_*` variables in `/.env` file accordingly.
+
+2.  Open a console terminal in the root directory of your project and execute the `php yii init/up` command.
+
 ```
-php init
+php yii init/up
 ```
-Otherwise, in production execute `php init` in non-interactive mode.
+Otherwise, in production execute `php yii init/env` and choose PROD environment.
 ```
-php init --env=Production --overwrite=All
+php yii init/env
 ```
 
-2. Create a new database and adjust the `components['db']` configuration in `base/config/main-local.php` accordingly.
-
-3. Open a console terminal in `app` folder, and run command:
-```
-php yii app/set-up
-```
-
-4. Set document roots of your web server:
+3. Set document roots of your web server:
 
    - for `/path/to/another.dev/public/` and using the URL `http://another.dev/`
 
@@ -139,7 +142,7 @@ php yii app/set-up
     }
 ```
 
-5. Change the hosts file to point the domain to your server.
+4. Change the hosts file to point the domain to your server.
 
    - Windows: `c:\Windows\System32\Drivers\etc\hosts`
    - Linux: `/etc/hosts`
@@ -150,7 +153,7 @@ php yii app/set-up
    127.0.0.1   another.dev
    ```
 
-To login into the application, use your username and password created when running `php yii app/set-up` command, or sing up with new credentials.
+To login into the application, use your username and password created when running `php yii init/up` command, or sing up with new credentials.
 
 ## Generating apps translations
 
@@ -193,7 +196,6 @@ app/
         views/               contains view files for the frontend Web app
         widgets/             contains frontend widgets
     vendor/                  contains dependent 3rd-party packages
-    env/                     contains environment-based overrides
 public/                      contains the entry script and Web resources for the frontend app
     storage/                 contains files such as user uploaded images, docs, archives shared between all appliactions
     admin/                   contains the entry script and Web resources for the backend app
@@ -201,6 +203,7 @@ public/                      contains the entry script and Web resources for the
         index.php            contains the entry script of the backend app
     assets/                  contains Web resources published by AssetBundles of the frontend app
     index.php                contains the entry script of the frontend app
+.env.example                 contains template for a dotenv file.
 ```
 
 *Made with :heart: by @delagics*
