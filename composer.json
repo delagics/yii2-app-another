@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "console\\helpers\\": "app/console/helpers/"
+            "console\\": "app/console/"
         },
         "files": [
             "app/base/helpers/helpers.php"

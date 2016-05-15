@@ -5,21 +5,6 @@ namespace console\helpers;
 class Console extends \yii\helpers\Console
 {
     /**
-     * Formats a string with ANSI codes.
-     *
-     * @param string $string the string to be formatted
-     * @return string
-     */
-    public static function ansiFormat($string)
-    {
-        $args = func_get_args();
-        array_shift($args);
-        $string = Console::ansiFormat($string, $args);
-
-        return $string;
-    }
-
-    /**
      * Gets input from STDIN and returns a string right-trimmed for EOLs.
      *
      * @param boolean $raw If set to true, returns the raw string without trimming
@@ -27,7 +12,7 @@ class Console extends \yii\helpers\Console
      */
     public static function stdin($raw = false)
     {
-        return BaseConsole::stdin($raw);
+        return parent::stdin($raw);
     }
 
     /**
@@ -40,9 +25,9 @@ class Console extends \yii\helpers\Console
     {
         $args = func_get_args();
         array_shift($args);
-        $string = BaseConsole::ansiFormat($string, $args) . "\n";
+        $string = parent::ansiFormat($string, $args) . "\n";
 
-        return BaseConsole::stdout($string);
+        return parent::stdout($string);
     }
 
     /**
@@ -55,8 +40,8 @@ class Console extends \yii\helpers\Console
     {
         $args = func_get_args();
         array_shift($args);
-        $string = BaseConsole::ansiFormat($string, $args) . "\n";
+        $string = parent::ansiFormat($string, $args) . "\n";
 
-        return BaseConsole::stderr($string);
+        return parent::stderr($string);
     }
 }
