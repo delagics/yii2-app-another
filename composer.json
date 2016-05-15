@@ -26,6 +26,9 @@
         "yiisoft/yii2-gii": "*"
     },
     "autoload": {
+        "psr-4": {
+            "console\\helpers\\": "app/console/helpers/"
+        },
         "files": [
             "app/base/helpers/helpers.php"
         ]
