@@ -20,7 +20,8 @@ deploying the application in different environments.
 - Adjusted language management through URLs with help of `codemix/yii2-localeurls` [[see](https://github.com/codemix/yii2-localeurls)];
 - Flexible user registration and authentication module `dektrium/yii2-user` [[see](https://github.com/dektrium/yii2-user)];
 - RBAC management module `dektrium/yii2-rbac` [[see](https://github.com/dektrium/yii2-rbac)];
-- Added `yii app` command with help of which it is easier to prepare your database [[see](https://github.com/delagics/yii2-app-another/blob/master/app/console/controllers/AppController.php)].
+- Added `yii init` command with help of which it is easier to prepare your project [[see](https://github.com/delagics/yii2-app-another/blob/master/app/console/controllers/InitController.php)];
+- Added dotenv support for easier project configuration.
 
 
 ## Installation
