@@ -160,10 +160,10 @@ To login into the application, use your username and password created when runni
 
 ```
 # For frontend:
-php yii message front/messages/config.php
+php yii message app/front/messages/config.php
 
 # For backend:
-php yii message back/messages/config.php
+php yii message app/back/messages/config.php
 ```
 
 DIRECTORY STRUCTURE
