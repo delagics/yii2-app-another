@@ -15,6 +15,15 @@ return [
             'enableQueryCache' => env('DB_QUERY_CACHE', true),
             'queryCacheDuration' => env('DB_QUERY_CACHE_DURATION', 3600),
         ],
+        'user' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'dektrium\user\models\User',
+            'loginUrl' => ['/user/security/login'],
+            'enableAutoLogin' => true,
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@base/views/mail',
@@ -31,6 +40,8 @@ return [
         'user' => [
             'class' => 'dektrium\user\Module',
             'enableUnconfirmedLogin' => true,
+            'confirmWithin' => 21600,
+            'cost' => 12,
             'admins' => explode(',', env('APP_ADMINS', 'admin')),
         ],
         'rbac' => [
