@@ -17,21 +17,23 @@ deploying the application in different environments.
 
 ## What's inside:
 
-- Adjusted language management through URLs with help of `codemix/yii2-localeurls` [[see](https://github.com/codemix/yii2-localeurls)];
-- Flexible user registration and authentication module `dektrium/yii2-user` [[see](https://github.com/dektrium/yii2-user)];
-- RBAC management module `dektrium/yii2-rbac` [[see](https://github.com/dektrium/yii2-rbac)];
-- Added `yii init` command with help of which it is easier to prepare your project [[see](https://github.com/delagics/yii2-app-another/blob/master/app/console/controllers/InitController.php)];
-- Added dotenv support for easier project configuration.
+- Improved project structure (see [Directory structure](#directory-structure));
+- Language management through URLs with help of [codemix/yii2-localeurls](https://github.com/codemix/yii2-localeurls);
+- Flexible user registration and authentication module ([dektrium/yii2-user](https://github.com/dektrium/yii2-user));
+- RBAC management module ([dektrium/yii2-rbac](https://github.com/dektrium/yii2-rbac));
+- `yii init` console command which simplifies project preparation;
+- [PHP dotenv](https://github.com/vlucas/phpdotenv) support, for easier project configuration, with Laravel like environment variable getter: `env('YII_ENV', 'dev')`;
 
+> **Note**: tests are currently not included.
 
-## Installation
-
-### Requirements
+## Requirements
 
 The minimum requirement by this project template is that your Web server supports PHP 5.4.0.
 Recommended is PHP 7.
 
-### Installing using Composer
+## Installation
+
+### Install using `composer`
 
 If you do not have [Composer](http://getcomposer.org/), follow the instructions in the
 [Installing Yii](https://github.com/yiisoft/yii2/blob/master/docs/guide/start-installation.md#installing-via-composer) section of the definitive guide to install it.
@@ -46,41 +48,41 @@ which allows managing bower and npm package dependencies through Composer. You o
 once for all. The second command installs the _another_ application in a directory named `another.dev`.
 You can choose a different directory name if you want.
 
-## Install by `git clone`
+Then follow the instructions given in the [Preparing application](#preparing-application) section.
+
+### Install with `git`
 
 Clone repository as a web root.
 ```
 git clone git@github.com:delagics/yii2-app-another.git another.dev
 ```
 
-A directory named `another.dev` is your Web root.
-Then `cd` to the `app` folder and run:
+> Directory named `another.dev` is your Web root.
+
+Then install the [composer asset plugin](https://github.com/francoispluchino/composer-asset-plugin/),
+go to the web root folder in a console terminal and run `composer install`:
+
 ```
+composer global require "fxp/composer-asset-plugin:~1.1.3"
+
+cd /var/www/another.dev
 composer install
 ```
 
-Then run composer scripts that occurs after the `composer create-project` command has been executed.
-
-```
-composer run-script post-create-project-cmd
-```
-
-Then follow the instructions given in the next subsection.
-
+Then follow the instructions given in the [Preparing application](#preparing-application) section.
 
 ## Preparing application
 
 After you install the application, you have to conduct the following steps to initialize
 the installed application. You only need to do these once for all.
 
-1.  Create a new database and adjust the `DB_*` variables in `/.env` file accordingly.
+1.  Create a new database.
 
-2.  Open a console terminal in the root directory of your project and execute the `php yii init/up` command.
+2.  Open a console terminal in the root directory of your project and execute the `php yii init` command,
+and follow the steps of the script.
 
-```
-php yii init/up
-```
-Otherwise, in production execute `php yii init/env` and choose PROD environment.
+When switching to production environment, execute `php yii init/env` and choose `PROD` environment.
+
 ```
 php yii init/env
 ```
@@ -166,8 +168,7 @@ php yii message app/front/messages/config.php
 php yii message app/back/messages/config.php
 ```
 
-DIRECTORY STRUCTURE
--------------------
+## Directory structure
 
 ```
 app/
