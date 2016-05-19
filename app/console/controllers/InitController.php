@@ -12,10 +12,10 @@ use console\helpers\Initializer;
 use console\components\Controller;
 
 /**
- * Class InitController
+ * Project initialization commands - provides a list of commands for fast project initialization.
  *
  * @package console\controllers
- * @property-read \yii\db\Connection $db
+ * @property Connection $db
  */
 class InitController extends Controller
 {
@@ -119,7 +119,7 @@ class InitController extends Controller
     }
 
     /**
-     * Set environment depending variables in the .env file.
+     * Set environment depending variables.
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      * @uses \console\helpers\Initializer::setEnv()
@@ -187,7 +187,7 @@ class InitController extends Controller
     }
 
     /**
-     * Prepare application by running depending modules migrations and other stuff.
+     * Prepare application by running depending modules migrations.
      * Deals basically with database but can be also cache, assets and so on.
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
@@ -255,9 +255,9 @@ class InitController extends Controller
     }
 
     /**
-     * Revert changes made by 'up' action.
-     * Reverts depending modules migrations and other stuff.
-     * This method probably will not work if there is holes in migration history.
+     * Revert depending modules migrations.
+     * Revert changes made by 'migrate-up' action.
+     * This method probably will not work if there are holes in migration history.
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
@@ -330,7 +330,7 @@ class InitController extends Controller
     }
 
     /**
-     * Runs 'destroy-db', 'up' and 'insert-demo' actions without user interaction.
+     * Run 'destroy-db', 'migrate-up' and 'insert-demo' actions without user interaction.
      *
      * @return int
      */

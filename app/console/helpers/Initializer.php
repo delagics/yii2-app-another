@@ -7,19 +7,6 @@ use Exception;
 class Initializer
 {
     /**
-     * @param $event
-     */
-    public static function postCreateProject($event)
-    {
-        $params = $event->getComposer()->getPackage()->getExtra();
-        if (isset($params[__METHOD__]) && is_array($params[__METHOD__])) {
-            foreach ($params[__METHOD__] as $method => $args) {
-                call_user_func_array([__CLASS__, $method], (array) $args);
-            }
-        }
-    }
-
-    /**
      * Set environment.
      *
      * @param string $env environment name.
@@ -166,6 +153,58 @@ class Initializer
                 file_put_contents($file, $content);
             } else {
                 Console::stderr("$file not found", Console::FG_RED);
+            }
+        }
+    }
+
+    /**
+     * Handler for composer 'post-create-project-cmd' event.
+     * Allows usage of Initializer helper functions when 'post-create-project-cmd' event is fired.
+     *
+     * Usage in composer.json:
+     *
+     * ```json
+     *
+     *  "autoload": {
+     *      "psr-4": {
+     *          "console\\": "app/console/"
+     *      },
+     *  },
+     *  "scripts": {
+     *      "post-create-project-cmd": [
+     *          "console\\helpers\\Initializer::postCreateProject"
+     *      ]
+     *  },
+     *  "extra": {
+     *      "console\\helpers\\Initializer::postCreateProject": {
+     *          "copyFile": [
+     *              ".env.example",
+     *              ".env"
+     *          ],
+     *          "setPermissions": [{
+     *              "app/back/runtime": "0777",
+     *              "app/front/runtime": "0777",
+     *              "app/console/runtime": "0777",
+     *              "public/admin/assets": "0777",
+     *              "public/assets": "0777",
+     *              "public/storage": "0777",
+     *              "yii": "0755"
+     *          }],
+     *          "setCookieValidationKey": [{
+     *              ".env": "<cookie_validation_key>"
+     *          }]
+     *      },
+     *  }
+     * ```
+     *
+     * @param $event
+     */
+    public static function postCreateProject($event)
+    {
+        $params = $event->getComposer()->getPackage()->getExtra();
+        if (isset($params[__METHOD__]) && is_array($params[__METHOD__])) {
+            foreach ($params[__METHOD__] as $method => $args) {
+                call_user_func_array([__CLASS__, $method], (array) $args);
             }
         }
     }
