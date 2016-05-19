@@ -26,9 +26,6 @@
         "yiisoft/yii2-gii": "*"
     },
     "autoload": {
-        "psr-4": {
-            "console\\": "app/console/"
-        },
         "files": [
             "app/base/helpers/helpers.php"
         ]
@@ -37,34 +34,7 @@
         "vendor-dir": "app/vendor",
         "process-timeout": 1800
     },
-    "scripts": {
-        "post-create-project-cmd": [
-            "console\\helpers\\Initializer::postCreateProject"
-        ]
-    },
     "extra": {
-        "console\\helpers\\Initializer::postCreateProject": {
-            "copyFile": [
-                ".env.example",
-                ".env"
-            ],
-            "setPermissions": [
-                {
-                    "app/back/runtime": "0777",
-                    "app/front/runtime": "0777",
-                    "app/console/runtime": "0777",
-                    "public/admin/assets": "0777",
-                    "public/assets": "0777",
-                    "public/storage": "0777",
-                    "yii": "0755"
-                }
-            ],
-            "setCookieValidationKey": [
-                {
-                    ".env": "<cookie_validation_key>"
-                }
-            ]
-        },
         "asset-installer-paths": {
             "npm-asset-library": "app/vendor/npm",
             "bower-asset-library": "app/vendor/bower"
