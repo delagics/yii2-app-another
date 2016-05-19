@@ -2,13 +2,13 @@
 
 namespace console\controllers;
 
-use console\helpers\Initializer;
 use Yii;
 use Exception;
 use yii\di\Instance;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 use console\helpers\Console;
+use console\helpers\Initializer;
 use console\components\Controller;
 
 /**
@@ -20,12 +20,6 @@ use console\components\Controller;
 class InitController extends Controller
 {
     /**
-     * @var string the ID of the action that is used when the action ID is not specified
-     * in the request. Defaults to 'up'.
-     */
-    public $defaultAction = 'up';
-
-    /**
      * @var Connection|array|string the DB connection object or the application component ID of the DB connection to use
      * when applying migrations. Starting from version 2.0.3, this can also be a configuration array
      * for creating the object.
@@ -33,8 +27,26 @@ class InitController extends Controller
     public $db = 'db';
 
     /**
+     * @var int color used for formatting notable messages.
+     */
+    public $colorNotable = Console::FG_YELLOW;
+    /**
+     * @var int color used for formatting success messages.
+     */
+    public $colorSuccess = Console::FG_GREEN;
+    /**
+     * @var int color used for formatting error messages.
+     */
+    public $colorError = Console::FG_RED;
+    /**
+     * @var int color used for formatting standard messages.
+     */
+    public $colorDefault = Console::FG_GREY;
+
+    /**
      * This method is invoked right before an action is to be executed (after all possible filters.)
      * It checks the existence of the [[migrationPath]].
+     *
      * @param \yii\base\Action $action the action to be executed.
      * @return boolean whether the action should continue to be executed.
      */
@@ -42,10 +54,68 @@ class InitController extends Controller
     {
         if (parent::beforeAction($action)) {
             $this->db = Instance::ensure($this->db, Connection::className());
+
             return true;
         } else {
             return false;
         }
+    }
+
+    /**
+     * General initialization action.
+     * This is just a wrapper for other separate actions.
+     *
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
+     */
+    public function actionIndex()
+    {
+        $exitCode = Yii::$app->runAction('init/project');
+
+        if ($exitCode === Controller::EXIT_CODE_NORMAL) {
+            Yii::$app->runAction('init/env');
+            Yii::$app->runAction('init/db');
+            Yii::$app->runAction('init/migrate-up');
+        }
+
+        return $exitCode;
+    }
+
+    /**
+     * Initialize project.
+     *
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
+     */
+    public function actionProject()
+    {
+        $str = Console::ansiFormat('Do you want to initialize(reinitialize) project?', [$this->colorNotable]);
+        $confirm = $this->confirm($str, false);
+
+        if ($confirm) {
+            $this->stdout('Initializing project...', $this->colorDefault);
+
+            $this->stdout('Copying .env file from .env.example template', $this->colorDefault);
+            Initializer::copyFile(".env.example", ".env", null);
+
+            $this->stdout('Setting folders permissions', $this->colorDefault);
+            Initializer::setPermissions([
+                'app/back/runtime' => "0777",
+                'app/front/runtime' => "0777",
+                'app/console/runtime' => "0777",
+                'public/admin/assets' => "0777",
+                'public/assets' => "0777",
+                'public/storage' => "0777",
+                'yii' => "0755",
+            ]);
+
+            $this->stdout('Setting cookie validation keys', $this->colorDefault);
+            Initializer::setCookieValidationKey([".env" => "<cookie_validation_key>"]);
+        } else {
+            $this->stdout('OK, project is not touched', $this->colorSuccess);
+
+            return Controller::EXIT_CODE_ERROR;
+        }
+
+        return Controller::EXIT_CODE_NORMAL;
     }
 
     /**
@@ -56,20 +126,62 @@ class InitController extends Controller
      */
     public function actionEnv()
     {
-        $str = Console::ansiFormat('Which environment to use? (DEV|PROD)', [Console::FG_YELLOW]);
+        $str = Console::ansiFormat('Which environment to use? (DEV|PROD)', [$this->colorNotable]);
         $answer = $this->prompt($str, ['default' => 'PROD']);
 
         if (!strncasecmp($answer, 'd', 1)) {
-            $this->stdout('Setting DEV environment...', Console::FG_GREEN);
+            $this->stdout('Setting DEV environment...', $this->colorDefault);
             Initializer::setEnv('dev');
         } elseif (!strncasecmp($answer, 'p', 1)) {
-            $this->stdout('Setting PROD environment...', Console::FG_GREEN);
+            $this->stdout('Setting PROD environment...', $this->colorDefault);
             Initializer::setEnv('prod');
         } else {
-            $this->stderr('Environment you choose does not exist', Console::FG_RED);
+            $this->stderr('Environment you choose does not exist', $this->colorError);
 
             return Controller::EXIT_CODE_ERROR;
         }
+
+        return Controller::EXIT_CODE_NORMAL;
+    }
+
+    /**
+     * Set database variables in the .env file.
+     *
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
+     * @uses \console\helpers\Initializer::setEnvVar()
+     */
+    public function actionDb()
+    {
+        $dbHostPrompt = Console::ansiFormat('Enter database host name: ', [$this->colorNotable]);
+        $dbHost = $this->prompt($dbHostPrompt, ['default' => env('DB_HOST', 'localhost')]);
+
+        $dbPortPrompt = Console::ansiFormat('Enter database host name: ', [$this->colorNotable]);
+        $dbPort = $this->prompt($dbPortPrompt, ['default' => env('DB_PORT', '3306')]);
+
+        $dbNamePrompt = Console::ansiFormat('Enter database name: ', [$this->colorNotable]);
+        $dbName = $this->prompt($dbNamePrompt, ['default' => env('DB_NAME', 'app_db')]);
+
+        $dbUserPrompt = Console::ansiFormat('Enter database user name: ', [$this->colorNotable]);
+        $dbUser = $this->prompt($dbUserPrompt, ['default' => env('DB_USERNAME', 'root')]);
+
+        $dbPassPrompt = Console::ansiFormat('Enter database user password: ', [$this->colorNotable]);
+        $dbPass = $this->prompt($dbPassPrompt, ['default' => env('DB_PASSWORD', '')]);
+
+        $dbCharsetPrompt = Console::ansiFormat('Enter database charset name: ', [$this->colorNotable]);
+        $dbCharset = $this->prompt($dbCharsetPrompt, ['default' => env('DB_CHARSET', 'utf8')]);
+
+        $this->stdout('Setting database...', $this->colorDefault);
+        Initializer::setEnvVar('DB_HOST', $dbHost);
+        Initializer::setEnvVar('DB_PORT', $dbPort);
+        Initializer::setEnvVar('DB_NAME', $dbName);
+        Initializer::setEnvVar('DB_USERNAME', $dbUser);
+        Initializer::setEnvVar('DB_PASSWORD', $dbPass);
+        Initializer::setEnvVar('DB_CHARSET', $dbCharset);
+
+        $this->db->username = $dbUser;
+        $this->db->password = $dbPass;
+        $this->db->charset = $dbCharset;
+        $this->db->dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
 
         return Controller::EXIT_CODE_NORMAL;
     }
@@ -80,25 +192,23 @@ class InitController extends Controller
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
-    public function actionUp()
+    public function actionMigrateUp()
     {
-        Yii::$app->runAction('init/env');
-
         /***************************************************************************************************************
          * Getting input data from console user.
          **************************************************************************************************************/
 
-        $emailStr = Console::ansiFormat('Enter admin user email:', [Console::FG_YELLOW]);
+        $emailStr = Console::ansiFormat('Enter admin user email:', [$this->colorNotable]);
         $email = $this->prompt($emailStr, [
             'default' => env('APP_ADMIN_EMAIL', 'admin@example.com'),
         ]);
 
-        $usernameStr = Console::ansiFormat('Enter admin user name:', [Console::FG_YELLOW]);
+        $usernameStr = Console::ansiFormat('Enter admin user name:', [$this->colorNotable]);
         $username = $this->prompt($usernameStr, [
             'default' => ArrayHelper::getValue(explode(',', env('APP_ADMINS', 'admin')), 0),
         ]);
 
-        $passwordStr = Console::ansiFormat('Enter global admin user password:', [Console::FG_YELLOW]);
+        $passwordStr = Console::ansiFormat('Enter global admin user password:', [$this->colorNotable]);
         $password = $this->prompt($passwordStr, ['default' => '123456']);
 
         $this->askForInteraction();
@@ -117,8 +227,9 @@ class InitController extends Controller
                 ]);
             }
         } catch (Exception $e) {
-            $this->stdout("Exception: {$e->getMessage()}\n", Console::FG_RED);
-            $this->stdout("({$e->getFile()}: {$e->getLine()})\n", Console::FG_RED);
+            $this->stdout("Exception: {$e->getMessage()}\n", $this->colorError);
+            $this->stdout("({$e->getFile()}: {$e->getLine()})\n", $this->colorError);
+
             return Controller::EXIT_CODE_ERROR;
         }
 
@@ -150,7 +261,7 @@ class InitController extends Controller
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
-    public function actionDown()
+    public function actionMigrateDown()
     {
         $this->askForInteraction();
 
@@ -195,25 +306,24 @@ class InitController extends Controller
      */
     public function actionDestroyDb()
     {
-        $str = Console::ansiFormat('Do you really want to destroy application database? (yes|no)', [Console::FG_YELLOW]);
-        $destroy = $this->prompt($str, ['default' => 'no']);
-        $destroy = $destroy == 'y' || $destroy == 'yes' ? true : false;
+        $str = Console::ansiFormat('Do you really want to destroy application database?', [$this->colorNotable]);
+        $confirm = $this->confirm($str, false);
 
-        if ($destroy) {
+        if ($confirm) {
             $tables = Yii::$app->getDb()->schema->tableNames;
             if ($tables) {
                 $this->db->createCommand('SET foreign_key_checks = 0;')->execute();
                 foreach ($tables as $table) {
-                    $this->stdout("Destroying $table table.", Console::FG_CYAN);
+                    $this->stdout("Destroying $table table", $this->colorDefault);
                     $this->db->createCommand()->dropTable($table)->execute();
                 }
                 $this->db->createCommand('SET foreign_key_checks = 1;')->execute();
-                $this->stdout('Successfully destroyed DB.', Console::FG_GREEN);
+                $this->stdout('Successfully destroyed DB', $this->colorSuccess);
             } else {
-                $this->stderr('No tables found.', Console::FG_YELLOW);
+                $this->stderr('No tables found', $this->colorError);
             }
         } else {
-            $this->stdout('OK, Application database is not touched.', Console::FG_YELLOW);
+            $this->stdout('OK, Application database is not touched', $this->colorSuccess);
         }
 
         return Controller::EXIT_CODE_NORMAL;
@@ -253,7 +363,7 @@ class InitController extends Controller
      */
     public function actionInsertDemo()
     {
-        $this->stdout('Inserting demo data...', Console::FG_PURPLE);
+        $this->stdout('Inserting demo data...', $this->colorDefault);
 
         // $command = $this->db->createCommand();
         // $command->batchInsert($model::tableName(), $model->attributes(), [
@@ -261,7 +371,7 @@ class InitController extends Controller
         //     [...]
         // ])->execute();
 
-        $this->stdout('Inserting demo data finished.', Console::FG_PURPLE);
+        $this->stdout('Inserting demo data finished', $this->colorDefault);
 
         return Controller::EXIT_CODE_NORMAL;
     }
@@ -273,9 +383,8 @@ class InitController extends Controller
      */
     public function askForInteraction()
     {
-        $str = Console::ansiFormat('Do you want to interact with this script? (yes|no)', [Console::FG_YELLOW]);
-        $isInteractive = $this->prompt($str, ['default' => 'no']);
-        $this->interactive = $isInteractive == 'no' || $isInteractive == 'n' ? false : true;
+        $str = Console::ansiFormat('Do you want to interact with this script?', [$this->colorNotable]);
+        $this->interactive = $this->confirm($str, true);
     }
 
     /**
