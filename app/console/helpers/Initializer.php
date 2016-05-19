@@ -51,7 +51,7 @@ class Initializer
     public static function setEnvVar($name, $value, $file = '.env')
     {
         if (is_file($file)) {
-            Console::stdout("Setting $name in $file", Console::FG_GREEN);
+            Console::stdout("Setting $name in $file", Console::FG_GREY);
             $content = file_get_contents($file);
             if ($content) {
                 $content = preg_replace('/^(' . $name . ')(.+)$/m', '$1 = ' . (string) $value, $content);
@@ -60,7 +60,6 @@ class Initializer
         } else {
             Console::stderr("File $file not found", Console::FG_RED);
         }
-
     }
 
     /**
@@ -73,12 +72,13 @@ class Initializer
     {
         $result = true;
         try {
-            Console::stdout("Removing $file", Console::FG_GREEN);
+            Console::stdout("Removing $file", Console::FG_GREY);
             unlink($file);
         } catch (Exception $e) {
             Console::stderr($e->getMessage(), Console::FG_RED);
             $result = false;
         }
+
         return $result;
     }
 
@@ -93,18 +93,18 @@ class Initializer
     public static function copyFile($source, $dest, $overwrite = null)
     {
         if (!is_file($source)) {
-            Console::stderr("File $dest skipped ($source not exist)", Console::FG_GREY);
+            Console::stderr("File $dest skipped ($source not exist)", Console::FG_GREEN);
             return true;
         }
         if (is_file($dest)) {
             if (file_get_contents($source) === file_get_contents($dest)) {
-                Console::stdout("File $dest unchanged", Console::FG_GREY);
+                Console::stdout("File $dest unchanged", Console::FG_GREEN);
                 return true;
             }
             Console::stdout("File $dest exist, overwrite? [Yes|No|Quit]", Console::FG_YELLOW);
             $answer = $overwrite === null ? Console::stdin() : $overwrite;
             if (!strncasecmp($answer, 'q', 1) || strncasecmp($answer, 'y', 1) !== 0) {
-                Console::stdout("Skipped $dest", Console::FG_GREY);
+                Console::stdout("Skipped $dest", Console::FG_GREEN);
                 return false;
             }
             file_put_contents($dest, file_get_contents($source));
@@ -128,17 +128,16 @@ class Initializer
     public static function setPermissions(array $paths)
     {
         foreach ($paths as $path => $permission) {
-            Console::stdout("chmod('$path', $permission)...", Console::FG_YELLOW);
             if (is_dir($path) || is_file($path)) {
                 try {
                     if (chmod($path, octdec($permission))) {
-                        Console::stdout("Done.", Console::FG_GREEN);
+                        Console::stdout("chmod('$path', $permission). Done.", Console::FG_GREEN);
                     };
                 } catch (Exception $e) {
                     Console::stderr($e->getMessage(), Console::FG_RED);
                 }
             } else {
-                Console::stderr("File not found.", Console::FG_RED);
+                Console::stderr('File not found', Console::FG_RED);
             }
         }
     }
@@ -157,7 +156,7 @@ class Initializer
 
         foreach ($paths as $file => $pattern) {
             if (is_file($file)) {
-                Console::stdout("Generating cookie validation key in " . $file, Console::FG_GREEN);
+                Console::stdout("Generating cookie validation key in $file", Console::FG_GREY);
                 $content = file_get_contents($file);
                 $content = preg_replace_callback("/$pattern/m", function () {
                     $length = 32;
@@ -166,9 +165,8 @@ class Initializer
                 }, $content);
                 file_put_contents($file, $content);
             } else {
-                Console::stderr($file . " not found", Console::FG_RED);
+                Console::stderr("$file not found", Console::FG_RED);
             }
         }
-
     }
 }
