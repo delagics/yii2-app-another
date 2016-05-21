@@ -5,6 +5,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/delagics/yii2-app-another/v/unstable.svg)](https://packagist.org/packages/delagics/yii2-app-another)
 [![Code Climate](https://codeclimate.com/github/delagics/yii2-app-another/badges/gpa.svg)](https://codeclimate.com/github/delagics/yii2-app-another)
 [![License](https://poser.pugx.org/delagics/yii2-app-another/license.svg)](https://packagist.org/packages/delagics/yii2-app-another)
+[![Yii2](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](http://www.yiiframework.com/extension/yii2-app-another)
 
 Yii 2 Another Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
 developing complex Web applications with multiple tiers.
