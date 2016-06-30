@@ -95,7 +95,7 @@ class LangSelect extends Widget
             }
             return strtr($this->template, [
                 '{label}' => $this->encodeLabels ? Html::encode($this->label) : $this->label,
-                '{url}' => $this->url,
+                '{url}' => Yii::$app->urlManager->createUrl($this->url),
                 '{items}' => $this->items ? Dropdown::widget([
                     'items' => $this->items,
                     'encodeLabels' => $this->encodeLabels
