@@ -22,7 +22,7 @@ return [
             'enableAutoLogin' => true,
         ],
         'authManager' => [
-            'class' => 'yii\rbac\DbManager',
+            'class' => 'dektrium\rbac\components\DbManager',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -45,7 +45,7 @@ return [
             'admins' => explode(',', env('APP_ADMINS', 'admin')),
         ],
         'rbac' => [
-            'class' => 'dektrium\rbac\Module',
+            'class' => 'dektrium\rbac\RbacWebModule',
         ],
     ],
 ];
