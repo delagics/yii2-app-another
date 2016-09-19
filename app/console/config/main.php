@@ -20,6 +20,11 @@ $config = [
             ],
         ],
     ],
+    'modules' => [
+        'rbac' => [
+            'class' => 'dektrium\rbac\RbacConsoleModule',
+        ],
+    ],
     'params' => $params,
 ];
 
