@@ -79,7 +79,7 @@ the installed application. You only need to do these once for all.
 
 1.  Create a new database.
 
-2.  Open a console terminal in the root directory of your project and execute the `php yii init` command,
+2.  Open a console terminal in the root directory of your project and execute the `php yii init/environment && php yii init/initialize` command,
 and follow the steps of the script.
 
 When switching to production environment, execute `php yii init/env` and choose `PROD` environment.
