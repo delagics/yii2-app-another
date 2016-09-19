@@ -62,22 +62,30 @@ class InitController extends Controller
     }
 
     /**
-     * General initialization action.
+     * Enironment initialization action.
      * This is just a wrapper for other separate actions.
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
-     */
-    public function actionIndex()
+     */     
+    public function actionEnvironment()
     {
-        $exitCode = Yii::$app->runAction('init/project');
-
-        if ($exitCode === Controller::EXIT_CODE_NORMAL) {
-            Yii::$app->runAction('init/env');
-            Yii::$app->runAction('init/db');
-            Yii::$app->runAction('init/migrate-up');
-        }
+        $exitCode = Yii::$app->runAction('init/env-project');
+        $exitCode = Yii::$app->runAction('init/env-env') && $exitCode;
+        $exitCode = Yii::$app->runAction('init/env-db') && $exitCode;
 
         return $exitCode;
+    }
+
+    /**
+     * General initialization action.
+     * This is just a wrapper for other separate actions.
+     * This one must be called only after 'environment' action is done.
+     *
+     * @return int the status of the action execution. 0 means normal, other values mean abnormal.
+     */
+    public function actionInitialize()
+    {
+        return Yii::$app->runAction('init/migrate-up');
     }
 
     /**
@@ -85,7 +93,7 @@ class InitController extends Controller
      *
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      */
-    public function actionProject()
+    public function actionEnvProject()
     {
         $str = Console::ansiFormat('Do you want to initialize(reinitialize) project?', [$this->colorNotable]);
         $confirm = $this->confirm($str, false);
@@ -124,7 +132,7 @@ class InitController extends Controller
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      * @uses \console\helpers\Initializer::setEnv()
      */
-    public function actionEnv()
+    public function actionEnvEnv()
     {
         $str = Console::ansiFormat('Which environment to use? (DEV|PROD)', [$this->colorNotable]);
         $answer = $this->prompt($str, ['default' => 'PROD']);
@@ -150,7 +158,7 @@ class InitController extends Controller
      * @return int the status of the action execution. 0 means normal, other values mean abnormal.
      * @uses \console\helpers\Initializer::setEnvVar()
      */
-    public function actionDb()
+    public function actionEnvDb()
     {
         $dbHostPrompt = Console::ansiFormat('Enter database host name: ', [$this->colorNotable]);
         $dbHost = $this->prompt($dbHostPrompt, ['default' => env('DB_HOST', 'localhost')]);
