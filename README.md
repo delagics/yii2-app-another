@@ -41,7 +41,7 @@ If you do not have [Composer](http://getcomposer.org/), follow the instructions 
 
 With Composer installed, you can then install the application using the following commands:
 
-    composer global require "fxp/composer-asset-plugin:~1.1.3"
+    composer global require "fxp/composer-asset-plugin:~1.2"
     composer create-project --prefer-dist delagics/yii2-app-another another.dev
 
 The first command installs the [composer asset plugin](https://github.com/francoispluchino/composer-asset-plugin/)
@@ -64,7 +64,7 @@ Then install the [composer asset plugin](https://github.com/francoispluchino/com
 go to the web root folder in a console terminal and run `composer install`:
 
 ```
-composer global require "fxp/composer-asset-plugin:~1.1.3"
+composer global require "fxp/composer-asset-plugin:~1.2"
 
 cd /var/www/another.dev
 composer install
