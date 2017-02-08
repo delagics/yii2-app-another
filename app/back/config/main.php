@@ -11,7 +11,6 @@ $config = [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'back\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
