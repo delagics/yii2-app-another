@@ -67,8 +67,14 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'debug';
     $config['bootstrap'][] = 'gii';
 
-    $config['modules']['debug'] = ['class' => 'yii\debug\Module'];
-    $config['modules']['gii'] = ['class' => 'yii\gii\Module'];
+    $config['modules']['debug'] = [
+        'class' => yii\debug\Module::class,
+        'allowedIPs' => ['*'], // Change this value on PRODUCTION, or switch environment to PROD
+    ];
+    $config['modules']['gii'] = [
+        'class' => yii\gii\Module::class,
+        'allowedIPs' => ['*'], // Change this value on PRODUCTION, or switch environment to PROD
+    ];
 }
 
 return $config;
