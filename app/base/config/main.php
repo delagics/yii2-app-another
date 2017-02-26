@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
+    'vendorPath' => dirname(dirname(dirname(__DIR__))) . '/vendor',
     'components' => [
         'db' => [
             'class' => env('DB_CLASS', 'yii\db\Connection'),

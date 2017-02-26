@@ -38,7 +38,7 @@ Desktop.ini
 *.lnk
 
 ### Composer ###
-/app/vendor
+/vendor
 /composer.phar
 /composer
 

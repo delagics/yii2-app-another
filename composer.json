@@ -12,18 +12,18 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.6.4",
         "yiisoft/yii2": "~2.0",
-        "yiisoft/yii2-bootstrap": "*",
-        "yiisoft/yii2-swiftmailer": "*",
+        "yiisoft/yii2-bootstrap": "~2.0",
+        "yiisoft/yii2-swiftmailer": "~2.0",
         "codemix/yii2-localeurls": "~1.4",
-        "dektrium/yii2-user": "0.9.*@dev",
-        "dektrium/yii2-rbac": "dev-master",
-        "vlucas/phpdotenv": "~2.2"
+        "dektrium/yii2-user": "~0.9",
+        "dektrium/yii2-rbac": "~1.0",
+        "vlucas/phpdotenv": "~2.4"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "*",
-        "yiisoft/yii2-gii": "*"
+        "yiisoft/yii2-debug": "~2.0",
+        "yiisoft/yii2-gii": "~2.0"
     },
     "autoload": {
         "files": [
@@ -31,13 +31,13 @@
         ]
     },
     "config": {
-        "vendor-dir": "app/vendor",
+        "vendor-dir": "vendor",
         "process-timeout": 1800
     },
     "extra": {
         "asset-installer-paths": {
-            "npm-asset-library": "app/vendor/npm",
-            "bower-asset-library": "app/vendor/bower"
+            "npm-asset-library": "vendor/npm",
+            "bower-asset-library": "vendor/bower"
         }
     }
 }
